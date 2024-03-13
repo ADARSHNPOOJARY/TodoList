@@ -1,8 +1,8 @@
 <template>
   <div class="todo-list">
-    <input class="task-input" v-model="newTask" @keyup.enter="addTask" placeholder="Add new task...">
+    <input class="task-input" v-model="newTask" @keyup.enter="addNewTask" placeholder="Add new task...">
     <ul class="task-list">
-      <li v-for="(task, index) in tasks" :key="index" class="task-item">
+      <li v-for="(task, index) in taskList" :key="index" class="task-item">
         <span :class="{ completed: task.completed }">{{ task.text }}</span>
         <div class="task-buttons">
           <button class="edit-button" @click="editTask(index)">Edit</button>
@@ -20,59 +20,60 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 
 export default {
+  name: 'TodoList',
   setup() {
-    const tasks = ref([]);
+    const taskList = ref([]);
     const newTask = ref('');
 
     const loadTasks = () => {
-      const savedTasks = JSON.parse(localStorage.getItem('tasks'));
-      if (savedTasks) {
-        tasks.value = savedTasks;
+      const savedTasksList = JSON.parse(localStorage.getItem('taskList'));
+      if (savedTasksList) {
+        taskList.value = savedTasksList;
       }
     };
 
-    const saveTasks = () => {
-      localStorage.setItem('tasks', JSON.stringify(tasks.value));
+    const saveTasksList = () => {
+      localStorage.setItem('taskList', JSON.stringify(taskList.value));
     };
 
-    const addTask = () => {
+    const addNewTask = () => {
       if (newTask.value.trim() !== '') {
-        tasks.value.push({ text: newTask.value, completed: false });
+        taskList.value.push({ text: newTask.value, completed: false });
         newTask.value = '';
-        saveTasks();
+        saveTasksList();
       }
     };
 
     const editTask = (index) => {
-      const newText = prompt('Edit task:', tasks.value[index].text);
+      const newText = prompt('Edit task:', taskList.value[index].text);
       if (newText !== null && newText.trim() !== '') {
-        tasks.value[index].text = newText;
-        saveTasks();
+        taskList.value[index].text = newText;
+        saveTasksList();
       }
     };
 
     const deleteTask = (index) => {
       if (confirm('Are you sure you want to delete this task?')) {
-        tasks.value.splice(index, 1);
-        saveTasks();
+        taskList.value.splice(index, 1);
+        saveTasksList();
       }
     };
 
     const toggleComplete = (index) => {
-      tasks.value[index].completed = !tasks.value[index].completed;
-      saveTasks();
+      taskList.value[index].completed = !taskList.value[index].completed;
+      saveTasksList();
     };
 
     onMounted(loadTasks);
 
     onBeforeUnmount(() => {
-      saveTasks();
+      saveTasksList();
     });
 
     return {
-      tasks,
+      taskList,
       newTask,
-      addTask,
+      addNewTask,
       editTask,
       deleteTask,
       toggleComplete
@@ -83,12 +84,12 @@ export default {
 
 <style scoped>
 .todo-list {
-  max-width: 400px;
+  max-width: 620px;
   margin: 0 auto;
 }
 
 .task-input {
-  width: calc(100% - 40px);
+  width: calc(100% - 240px);
   padding: 10px;
   font-size: 16px;
   margin-bottom: 10px;
@@ -118,18 +119,21 @@ export default {
 }
 
 .edit-button {
-  background-color: #ffc107;
+   width: 60px; 
+ background-color: #3f51b5;
   color: #fff;
   border: none;
 }
 
 .delete-button {
-  background-color: #dc3545;
+   width: 60px; 
+background-color: #f44336;
   color: #fff;
   border: none;
 }
 
 .complete-button {
+   width: 124px;
   background-color: #28a745;
   color: #fff;
   border: none;
